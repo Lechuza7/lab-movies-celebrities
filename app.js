@@ -1,34 +1,58 @@
-// ℹ️ Gets access to environment variables/settings
-// https://www.npmjs.com/package/dotenv
-require('dotenv/config');
+require('dotenv').config();
 
-// ℹ️ Connects to the database
-require('./db');
-
-// Handles http requests (express is node js framework)
-// https://www.npmjs.com/package/express
+const createError = require('http-errors');
 const express = require('express');
+const logger = require('morgan');
+const path = require('path');
 
-// Handles the handlebars
-// https://www.npmjs.com/package/hbs
-const hbs = require('hbs');
+require('./config/hbs.config');
+require('./config/db.config');
 
 const app = express();
 
-// ℹ️ This function is getting exported from the config folder. It runs most middlewares
-require('./config')(app);
+/**
+ * Middlewares
+ */
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(logger('dev'));
 
-// default value for title local
-const projectName = 'lab-movies-celebrities';
-const capitalized = string => string[0].toUpperCase() + string.slice(1).toLowerCase();
+app.use((req, res, next) => {
+  // la variable path se podrá usar desde cualquier vista de hbs (/register, /posts)
+  res.locals.path = req.path;
 
-app.locals.title = `${capitalized(projectName)}- Generated with Ironlauncher`;
+  // Damos paso al siguiente middleware
+  next();
+});
 
-// 👇 Start handling routes here
-const index = require('./routes/index');
-app.use('/', index);
+/**
+ * View setup
+ */
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
 
-// ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
-require('./error-handling')(app);
+/**
+ * Configure routes
+ */
+const router = require('./config/routes.config');
+app.use('/', router);
 
-module.exports = app;
+app.use((req, res, next) => {
+  next(createError(404, 'Page not found'));
+});
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  let status = error.status || 500;
+
+  res.status(status).render('error', {
+    message: error.message,
+    error: req.app.get('env') === 'development' ? error : {},
+  });
+});
+
+const port = Number(process.env.PORT || 3000);
+
+app.listen(port, () => {
+  console.log(`Ready! Listening on port ${port}`);
+});
