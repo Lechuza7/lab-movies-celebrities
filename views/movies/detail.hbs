@@ -8,13 +8,9 @@
 
 <h3>Cast</h3>
 
-<ul>
-  {{#each movie.cast as |celebrity|}}
-    <li>
-      {{celebrity.name}}
-    </li>
-  {{/each}}
-</ul>
+<p>
+    {{movie.mainCelebrity.name}}
+</p>
 
 <form action="/movies/{{movie.id}}/delete" method="POST">
   <button type="submit">Delete Movie</button>
