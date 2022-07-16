@@ -62,3 +62,41 @@ module.exports.delete = (req, res, next) => {
     })
     .catch(next);
 };
+
+module.exports.edit = (req, res, next) => {
+  Movie.findById(req.params.id)
+    .then((movie) => {
+      if (movie) {
+        return Celebrity.find().then((celebrities) => {
+          res.render("movies/edit", { movie, celebrities });
+        });
+      } else {
+        res.redirect("/movies");
+      }
+    })
+    .catch((error) => next(error));
+};
+
+module.exports.doEdit = (req, res, next) => {
+  const data = ({ title, genre, plot, mainCelebrity } = req.body);
+
+  Movie.findByIdAndUpdate(req.params.id, data)
+    .then((movie) => {
+      res.redirect(`/movies/${movie.id}`);
+    })
+    .catch((error) => {
+      if (error instanceof mongoose.Error.ValidationError) {
+        Celebrity.find()
+          .then((celebrities) => {
+            res.render("movies/edit", {
+              errors: error.errors,
+              movie: data,
+              celebrities,
+            });
+          })
+          .catch(next);
+      } else {
+        next(error);
+      }
+    });
+};
