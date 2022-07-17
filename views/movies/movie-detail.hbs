@@ -1,0 +1,11 @@
+<a href="/">Go back</a>
+<hr>
+<h1>Title: {{movie.title}}</h1>
+<h3>Genre: {{movie.genre}}</h3>
+<h3>Plot: {{movie.plot}}</h3>
+<h3>Main Celebrity: {{movie.mainCelebrity.name}}</h3>
+
+<a href="/movies/{{movie.id}}/edit">Edit</a>
+<form action="/movies/{{movie.id}}/delete" method="POST">
+    <button type="submit">Delete</button>
+</form>

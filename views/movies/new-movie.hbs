@@ -1,0 +1,14 @@
+<a href="/">Go back</a>
+<hr>
+<h2>New Movie</h2>
+<form action="/movies" method="POST">
+    <input type="text" name="title" placeholder="Title">
+    <input type="text" name="genre" placeholder="Genre">
+    <input type="text" name="plot" placeholder="Plot">
+    <select name="mainCelebrity">
+        {{#each celebrities as |celebrity|}}
+            <option value="{{celebrity.id}}">{{celebrity.name}}</option>
+        {{/each}}
+    </select>
+    <button type="submit">Create Movie</button>
+</form>

@@ -1,0 +1,9 @@
+<a href="/">Go back</a>
+<hr>
+<h2>Movies List</h2>
+<hr>
+{{#each movies as |movie|}}
+    <h3>Title: {{movie.title}}</h3>
+    <a href="/movies/{{movie.id}}/detail">Movie Detail</a>
+    <hr>
+{{/each}}
